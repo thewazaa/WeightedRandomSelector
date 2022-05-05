@@ -1,19 +1,19 @@
-﻿
-namespace DataStructures.RandomSelector {
-    using DataStructures.RandomSelector.Math;
+﻿using DataStructures.RandomSelector.Math;
 
+namespace DataStructures.RandomSelector
+{
     /// <summary>
     /// Uses Linear Search for picking random items
     /// Good for small sized number of items
     /// </summary>
     /// <typeparam name="T">Type of items you wish this selector returns</typeparam>
-    public class StaticRandomSelectorLinear<T> : IRandomSelector<T> {
-
-        System.Random random;
+    public class StaticRandomSelectorLinear<T> : IRandomSelector<T>
+    {
+        private readonly System.Random _random;
 
         // internal buffers
-        T[] items;
-        float[] CDA;
+        private readonly T[] _items;
+        private readonly float[] _CDA;
 
         /// <summary>
         /// Constructor, used by StaticRandomSelectorBuilder
@@ -22,11 +22,11 @@ namespace DataStructures.RandomSelector {
         /// <param name="items">Items of type T</param>
         /// <param name="CDA">Cummulative Distribution Array</param>
         /// <param name="seed">Seed for internal random generator</param>
-        public StaticRandomSelectorLinear(T[] items, float[] CDA, int seed) {
-
-            this.items = items;
-            this.CDA = CDA;
-            this.random = new System.Random(seed);           
+        public StaticRandomSelectorLinear(T[] items, float[] CDA, int seed)
+        {
+            this._items = items;
+            this._CDA = CDA;
+            this._random = new System.Random(seed);
         }
 
         /// <summary>
@@ -34,9 +34,9 @@ namespace DataStructures.RandomSelector {
         /// Uses linear search for random selection.
         /// </summary>
         /// <returns>Returns item</returns>
-        public T SelectRandomItem(float randomValue) {
-        
-            return items[ CDA.SelectIndexLinearSearch(randomValue) ];
+        public T SelectRandomItem(float randomValue)
+        {
+            return _items[_CDA.SelectIndexLinearSearch(randomValue)];
         }
 
         /// <summary>
@@ -45,11 +45,11 @@ namespace DataStructures.RandomSelector {
         /// </summary>
         /// <param name="randomValue">Random value from your uniform generator</param>
         /// <returns>Returns item</returns>
-        public T SelectRandomItem() {
-        
-            float randomValue = (float) random.NextDouble();
-            
-            return items[ CDA.SelectIndexLinearSearch(randomValue) ];
+        public T SelectRandomItem()
+        {
+            float randomValue = (float)_random.NextDouble();
+
+            return _items[_CDA.SelectIndexLinearSearch(randomValue)];
         }
     }
 }

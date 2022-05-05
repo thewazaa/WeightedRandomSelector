@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using DataStructures.RandomSelector.Math;
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// By Vili Volcini
@@ -10,24 +10,26 @@ using System;
 /// O(n) per random pick for smaller arrays
 /// O(n) construction
 /// </summary>
-namespace DataStructures.RandomSelector {
-    using DataStructures.RandomSelector.Math;
-
+namespace DataStructures.RandomSelector
+{
     /// <summary>
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class RandomSelectorBuilder<T> : IRandomSelectorBuilder<T> {
-    
-        private System.Random random;
-        private List<T> itemBuffer;
-        private List<float> weightBuffer;
+    public class RandomSelectorBuilder<T> : IRandomSelectorBuilder<T>
+    {
+        private readonly Random _random;
+        private readonly List<T> _itemBuffer;
+        private readonly List<float> _weightBuffer;
 
-        public RandomSelectorBuilder() {
+        private static readonly RandomSelectorBuilder<T> _staticBuilder = new RandomSelectorBuilder<T>();
 
-            random       = new System.Random();
-            itemBuffer   = new List<T>();
-            weightBuffer = new List<float>();
+        public RandomSelectorBuilder()
+        {
+
+            _random = new System.Random();
+            _itemBuffer = new List<T>();
+            _weightBuffer = new List<float>();
         }
 
         /// <summary>
@@ -36,45 +38,45 @@ namespace DataStructures.RandomSelector {
         /// </summary>
         /// <param name="item">Item that will be returned on random selection</param>
         /// <param name="weight">Non-zero non-normalized weight</param>
-        public void Add(T item, float weight) {
+        public void Add(T item, float weight)
+        {
 
             // ignore zero weight items
             if (weight == 0)
                 return;
 
-            itemBuffer.Add(item);
-            weightBuffer.Add(weight);
+            _itemBuffer.Add(item);
+            _weightBuffer.Add(weight);
         }
-        
+
         /// <summary>
         /// Builds StaticRandomSelector & clears internal buffers. Must be called after you finish Add-ing items.
         /// </summary>
         /// <param name="seed">Seed for random selector. If you leave it -1, the internal random will generate one.</param>
         /// <returns>Returns IRandomSelector, underlying objects are either StaticRandomSelectorLinear or StaticRandomSelectorBinary. Both are non-mutable.</returns>
-        public IRandomSelector<T> Build(int seed = -1) {
+        public IRandomSelector<T> Build(int seed = -1)
+        {
 
-            T[] items = itemBuffer.ToArray();
-            float[] CDA = weightBuffer.ToArray();
-            
-            itemBuffer.Clear();     
-            weightBuffer.Clear();
+            T[] items = _itemBuffer.ToArray();
+            float[] CDA = _weightBuffer.ToArray();
+
+            _itemBuffer.Clear();
+            _weightBuffer.Clear();
 
             RandomMath.BuildCumulativeDistribution(CDA);
-            
-            if(seed == -1)
-                seed = random.Next();
-                
+
+            if (seed == -1)
+                seed = _random.Next();
+
             // RandomMath.ArrayBreakpoint decides where to use Linear or Binary search, based on internal buffer size
             // if CDA array is smaller than breakpoint, then pick linear search random selector, else pick binary search selector
-            if (CDA.Length < RandomMath.ArrayBreakpoint) 
-           
-                return new StaticRandomSelectorLinear<T>(items, CDA, seed);
-            else 
-                // bigger array sizes need binary search for much faster lookup
-                return new StaticRandomSelectorBinary<T>(items, CDA, seed);           
-        }
+            if (CDA.Length < RandomMath.ArrayBreakpoint)
 
-        static RandomSelectorBuilder<T> _staticBuilder = new RandomSelectorBuilder<T>();
+                return new StaticRandomSelectorLinear<T>(items, CDA, seed);
+            else
+                // bigger array sizes need binary search for much faster lookup
+                return new StaticRandomSelectorBinary<T>(items, CDA, seed);
+        }
 
         /// <summary>
         /// non-instance based, single threaded only. For ease of use. 
@@ -83,11 +85,12 @@ namespace DataStructures.RandomSelector {
         /// <param name="itemsArray">Array of items</param>
         /// <param name="weightsArray">Array of non-zero non-normalized weights. Have to be same length as itemsArray.</param>
         /// <returns></returns>
-        public static IRandomSelector<T> Build(T[] itemsArray, float[] weightsArray) {
+        public static IRandomSelector<T> Build(T[] itemsArray, float[] weightsArray)
+        {
 
-            _staticBuilder.Clear();    
+            _staticBuilder.Clear();
 
-            for(int i = 0; i < itemsArray.Length; i++)
+            for (int i = 0; i < itemsArray.Length; i++)
                 _staticBuilder.Add(itemsArray[i], weightsArray[i]);
 
             return _staticBuilder.Build();
@@ -101,8 +104,9 @@ namespace DataStructures.RandomSelector {
         /// <param name="itemsList">List of weights</param>
         /// <param name="weightsList">List of non-zero non-normalized weights. Have to be same length as itemsList.</param>
         /// <returns></returns>
-        public static IRandomSelector<T> Build(List<T> itemsList, List<float> weightsList) {
-            
+        public static IRandomSelector<T> Build(List<T> itemsList, List<float> weightsList)
+        {
+
             _staticBuilder.Clear();
 
             for (int i = 0; i < itemsList.Count; i++)
@@ -110,11 +114,12 @@ namespace DataStructures.RandomSelector {
 
             return _staticBuilder.Build();
         }
-        
-        private void Clear() {
 
-            itemBuffer.Clear();
-            weightBuffer.Clear();
+        private void Clear()
+        {
+
+            _itemBuffer.Clear();
+            _weightBuffer.Clear();
         }
-    }  
+    }
 }

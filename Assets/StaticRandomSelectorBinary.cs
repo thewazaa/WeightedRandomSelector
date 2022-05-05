@@ -1,5 +1,5 @@
-﻿
-namespace DataStructures.RandomSelector {
+﻿namespace DataStructures.RandomSelector
+{
     using DataStructures.RandomSelector.Math;
 
     /// <summary>
@@ -7,12 +7,12 @@ namespace DataStructures.RandomSelector {
     /// Good for large sized number of items
     /// </summary>
     /// <typeparam name="T">Type of items you wish this selector returns</typeparam>
-    public class StaticRandomSelectorBinary<T> : IRandomSelector<T> {
+    public class StaticRandomSelectorBinary<T> : IRandomSelector<T>
+    {
+        private readonly System.Random _random;
+        private readonly T[] _items;
+        private readonly float[] _CDA;
 
-        System.Random random;
-        T[] items;
-        float[] CDA;
-        
         /// <summary>
         /// Constructor, used by StaticRandomSelectorBuilder
         /// Needs array of items and CDA (Cummulative Distribution Array). 
@@ -20,23 +20,25 @@ namespace DataStructures.RandomSelector {
         /// <param name="items">Items of type T</param>
         /// <param name="CDA">Cummulative Distribution Array</param>
         /// <param name="seed">Seed for internal random generator</param>
-        public StaticRandomSelectorBinary(T[] items, float[] CDA, int seed) {
+        public StaticRandomSelectorBinary(T[] items, float[] CDA, int seed)
+        {
 
-            this.items = items;
-            this.CDA = CDA;
-            this.random = new System.Random(seed);
+            this._items = items;
+            this._CDA = CDA;
+            this._random = new System.Random(seed);
         }
-        
+
         /// <summary>
         /// Selects random item based on their weights.
         /// Uses binary search for random selection.
         /// </summary>
         /// <returns>Returns item</returns>
-        public T SelectRandomItem() {
+        public T SelectRandomItem()
+        {
 
-            float randomValue = (float) random.NextDouble();
-            
-            return items[ CDA.SelectIndexBinarySearch(randomValue) ];
+            float randomValue = (float)_random.NextDouble();
+
+            return _items[_CDA.SelectIndexBinarySearch(randomValue)];
         }
 
         /// <summary>
@@ -45,9 +47,10 @@ namespace DataStructures.RandomSelector {
         /// </summary>
         /// <param name="randomValue">Random value from your uniform generator</param>
         /// <returns>Returns item</returns>
-        public T SelectRandomItem(float randomValue) {
-        
-            return items[ CDA.SelectIndexBinarySearch(randomValue) ];
+        public T SelectRandomItem(float randomValue)
+        {
+
+            return _items[_CDA.SelectIndexBinarySearch(randomValue)];
         }
     }
 }
